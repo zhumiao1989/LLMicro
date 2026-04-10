@@ -1,0 +1,105 @@
+# LLM Configuration for LLMicro
+
+# RAG Configuration
+rag:
+  enabled: true
+  knowledge_dir: data/knowledge
+  index_dir: data/index
+  embedding_model: all-MiniLM-L6-v2
+  top_k_evidence: 3
+  multi_round_retrieval: true
+
+# API Configuration
+api:
+  # Supported providers: anthropic, openai
+  provider: anthropic
+  model: claude-sonnet-4-5-20250929
+  # For Anthropic
+  anthropic_api_key: ${ANTHROPIC_API_KEY}
+  # For OpenAI
+  openai_api_key: ${OPENAI_API_KEY}
+  openai_base_url: null
+
+# Generation parameters
+generation:
+  temperature: 0.1  # Low temperature for consistent recommendations
+  max_tokens: 2048
+  top_p: 0.95
+
+# Structured output constraints
+output_constraints:
+  # Only allow valid parameter names from predefined schema
+  enforce_parameter_schema: true
+  # Require evidence support for non-default values (when RAG enabled)
+  require_evidence_support: false
+  # Fallback to defaults when evidence is insufficient
+  fallback_to_defaults: true
+
+# Prompt configuration
+prompt:
+  # System prompt for parameter recommendation
+  system: |
+    You are an expert bioinformatics assistant specializing in metagenomic classification parameter optimization.
+    Your task is to recommend optimal parameters for metagenomic classification tools based on sample characteristics.
+
+    You need to balance:
+    - Precision (minimizing false positives)
+    - Recall (maximizing true detections)
+    - Abundance estimation accuracy
+    - Computational resource constraints
+
+    Always provide reasoning for your recommendations.
+
+# Parameter ranges for each tool
+parameter_ranges:
+  kraken2:
+    confidence:
+      min: 0.0
+      max: 1.0
+      default: 0.0
+      description: "Confidence threshold for classification (higher = more precise but lower recall)"
+    minimum_hit_groups:
+      min: 1
+      max: 5
+      default: 1
+      description: "Minimum number of hit groups required for classification"
+
+  centrifuge:
+    k:
+      min: 1
+      max: 10
+      default: 1
+      description: "Report up to k distinct alignments per read"
+    min_hitlen:
+      min: 15
+      max: 35
+      default: 15
+      description: "Minimum length of seed hit required"
+
+  pathseq:
+    min_clipped_read_length:
+      min: 30
+      max: 40
+      default: 30
+      description: "Minimum length of clipped read for alignment"
+    host_min_identity:
+      min: 80
+      max: 100
+      default: 95
+      description: "Minimum identity for host read alignment"
+    min_score_identity:
+      min: 0.80
+      max: 1.0
+      default: 0.95
+      description: "Minimum identity score for microbial alignment"
+    identity_margin:
+      min: 0.0
+      max: 0.1
+      default: 0.05
+      description: "Margin for multiple matching reads retention"
+
+# Resource constraints
+resource_constraints:
+  max_memory_gb: 64
+  max_threads: 16
+  target_speed_m_reads_per_min: 1.0

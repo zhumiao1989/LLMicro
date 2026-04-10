@@ -1,0 +1,121 @@
+# Simulation Configuration for LLMicro
+
+# Common settings
+common:
+  read_length: 150
+  error_model: "illumina"
+  random_seed: 42
+  host_genome: "hg38"
+  host_contamination_rate: 0.90  # 90% human reads
+
+# Low complexity dataset (Dataset 1)
+# Purpose: Evaluate basic read-level classification ability
+low_complexity:
+  n_samples: 20
+  species_range:
+    min: 10
+    max: 30
+  abundance_distribution: "uniform"
+  description: "Low complexity samples with 10-30 species, uniform abundance"
+  evaluation_focus:
+    - read_level_precision
+    - read_level_recall
+    - read_level_f1
+
+# Medium complexity dataset (Dataset 2)
+# Purpose: Evaluate profiling abundance estimation
+medium_complexity:
+  n_samples: 20
+  species_range:
+    min: 50
+    max: 150
+  abundance_distribution: "lognormal"
+  lognormal_params:
+    mu: 0
+    sigma: 2
+  description: "Medium complexity samples with 50-150 species, lognormal abundance (typical microbiome)"
+  evaluation_focus:
+    - profiling_f1
+    - l1_norm_error
+    - l2_distance
+
+# High complexity dataset (Dataset 3)
+# Purpose: Evaluate low-abundance false positive control
+high_complexity:
+  n_samples: 20
+  species_range:
+    min: 200
+    max: 400
+  abundance_distribution: "stepped"
+  description: "High complexity samples with 200-400 species, stepped abundance (long-tail rare biosphere)"
+  evaluation_focus:
+    - false_positive_control
+    - low_abundance_detection
+    - specificity
+
+# Mock community configuration
+mock_community:
+  n_replicates: 10
+  total_species: 12
+  composition:
+    # Gram-negative bacteria
+    - name: "Escherichia coli"
+      taxonomy_id: 562
+      abundance: 0.15
+    - name: "Pseudomonas aeruginosa"
+      taxonomy_id: 287
+      abundance: 0.10
+    - name: "Salmonella enterica"
+      taxonomy_id: 590
+      abundance: 0.10
+    # Gram-positive bacteria
+    - name: "Staphylococcus aureus"
+      taxonomy_id: 1280
+      abundance: 0.12
+    - name: "Bacillus subtilis"
+      taxonomy_id: 1423
+      abundance: 0.10
+    - name: "Limosilactobacillus fermentum"
+      taxonomy_id: 1585
+      abundance: 0.08
+    - name: "Enterococcus faecalis"
+      taxonomy_id: 1351
+      abundance: 0.08
+    - name: "Listeria monocytogenes"
+      taxonomy_id: 1639
+      abundance: 0.07
+    # Fungi
+    - name: "Saccharomyces cerevisiae"
+      taxonomy_id: 4932
+      abundance: 0.10
+    - name: "Cryptococcus neoformans"
+      taxonomy_id: 5207
+      abundance: 0.05
+    # Phage/Virus (internal control)
+    - name: "PhiX174"
+      taxonomy_id: 10847
+      abundance: 0.03
+    - name: "Lambda phage"
+      taxonomy_id: 10710
+      abundance: 0.02
+  matrix: "human"
+  description: "Mock community with 12 known microbes in human matrix"
+
+# Error model parameters
+error_model:
+  illumina:
+    # Based on Illumina NovaSeq error profiles
+    substitution_rate: 0.001
+    insertion_rate: 0.0001
+    deletion_rate: 0.0001
+    quality_decay: "exponential"
+    quality_params:
+      mean_q30: 0.85
+      cycle_effect: true
+
+# Output settings
+output:
+  formats:
+    - fastq
+    - ground_truth.tsv
+  compress: true

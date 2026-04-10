@@ -1,0 +1,143 @@
+# Classification Tools Configuration
+
+# Kraken2 Configuration
+kraken2:
+  name: "Kraken2"
+  version: "2.1.2"
+  description: "k-mer based metagenomic classifier with high throughput"
+
+  # Command template
+  command: >
+    kraken2
+    --db {database}
+    --threads {threads}
+    --report {output_report}
+    --output {output_classifications}
+    --confidence {confidence}
+    --minimum-hit-groups {minimum_hit_groups}
+    {input_reads}
+
+  # Required files
+  required_files:
+    - database.k2d
+    - hash.k2d
+    - opts.k2d
+
+  # Output parsing
+  output:
+    report_format: "kraken"
+    classification_format: "kraken"
+
+  # Default parameters
+  defaults:
+    confidence: 0.0
+    minimum_hit_groups: 1
+    threads: 8
+
+# Centrifuge Configuration
+centrifuge:
+  name: "Centrifuge"
+  version: "1.0.4"
+  description: "Compressed index-based metagenomic classifier"
+
+  # Command template
+  command: >
+    centrifuge
+    -x {database}
+    -p {threads}
+    -k {k}
+    --min-hitlen {min_hitlen}
+    --report-file {output_report}
+    -U {input_reads}
+    > {output_classifications}
+
+  # Required files
+  required_files:
+    - .1.cf
+    - .2.cf
+    - .3.cf
+    - .4.cf
+
+  # Output parsing
+  output:
+    report_format: "centrifuge"
+    classification_format: "centrifuge"
+
+  # Default parameters
+  defaults:
+    k: 1
+    min_hitlen: 15
+    threads: 8
+
+# PathSeq Configuration
+pathseq:
+  name: "PathSeq"
+  version: "4.5.0.0"
+  description: "Host-aware metagenomic classifier for high-background samples"
+
+  # Command template (GATK4 PathSeq)
+  command: >
+    gatk PathSeqPipelineSpark
+    --input {input_reads}
+    --reference {reference_fasta}
+    --host-reference {host_reference}
+    --microbe-reference {microbe_reference}
+    --output {output_directory}
+    --min-clipped-read-length {min_clipped_read_length}
+    --host-min-identity {host_min_identity}
+    --min-score-identity {min_score_identity}
+    --identity-margin {identity_margin}
+    --spark-runner SPARK
+    --conf spark.driver.memory={driver_memory}
+    --conf spark.executor.memory={executor_memory}
+
+  # Required files
+  required_files:
+    - host.fasta
+    - microbe.fasta
+    - host.kmer
+    - microbe.kmer
+
+  # Output parsing
+  output:
+    report_format: "pathseq"
+    classification_format: "pathseq"
+
+  # Default parameters
+  defaults:
+    min_clipped_read_length: 30
+    host_min_identity: 95
+    min_score_identity: 0.95
+    identity_margin: 0.05
+    threads: 8
+    driver_memory: "4G"
+    executor_memory: "8G"
+
+# Database configuration
+database:
+  # Source for reference sequences
+  source: "GenBank 202404"
+
+  # Included taxa
+  taxa:
+    - Bacteria
+    -Fungi
+    - Parasites
+    - Viruses
+
+  # Preprocessing steps
+  preprocessing:
+    - quality_filter
+    - dereplication
+    - taxonomy_annotation
+
+  # Index settings
+  index:
+    kraken2:
+      kmer_length: 35
+      spaced_kmer: false
+    centrifuge:
+      seed_length: 15
+      error_threshold: 2
+    pathseq:
+      kmer_length: 31

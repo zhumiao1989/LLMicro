@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/*.fastq
+data/*.fq
+data/*.bam
+data/*.cram
+data/simulated/*/_reads.fastq
+data/mock/*/_reads.fastq
+
+# Results (keep structure, exclude large files)
+results/**/*.bam
+results/**/*.cram
+results/classifications/*_reads.fastq
+
+# Temporary files
+*.tmp
+*.log
+temp/
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
+credentials.json

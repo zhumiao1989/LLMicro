@@ -119,7 +119,6 @@ python src/visualize.py \
 bash scripts/run_pipeline.sh \
     --n-samples 20 \
     --seed 42 \
-    --provider anthropic \
     --use-rag
 ```
 
